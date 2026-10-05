@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cited</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Outfit:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+  <canvas id="field"></canvas>
+  <div class="wrap">
+    <header>
+      <div>
+        <h1>Cited</h1>
+        <p>Put a document on the left. Ask on the right. The answer is a passage, or a refusal.</p>
+      </div>
+      <div class="steps">
+        <span><b>1</b> Load</span>
+        <span><b>2</b> Ask</span>
+        <span class="mono">{{ doc_name }}</span>
+      </div>
+    </header>
+    <div class="grid">
+      <section class="panel">
+        <form method="post" action="/document" enctype="multipart/form-data">
+          <label for="text">Document</label>
+          <textarea id="text" name="text" placeholder="Paste the text here. A PDF or txt upload works too.">{{ draft }}</textarea>
+          <div class="row">
+            <input class="file" type="file" name="file" accept=".pdf,.txt,text/plain,application/pdf">
+            <button type="submit">Use this document</button>
+            <button class="ghost" formaction="/sample" formmethod="post" type="submit">Load sample</button>
+          </div>
+        </form>
+      </section>
+      <section class="panel">
+        <form method="post" action="/ask">
+          <label for="question">Question</label>
+          <input id="question" name="question" type="text" value="{{ question }}" placeholder="Ask in plain words" required>
+          <div class="row"><button type="submit">Ask</button></div>
+          <div class="chips">
+            <button type="submit" name="question" value="When does the yard shift start?">Yard shift</button>
+            <button type="submit" name="question" value="What plan is NX-DEMO-1042?">License plan</button>
+            <button type="submit" name="question" value="Are Sunday deliveries accepted?">Sunday dock</button>
+            <button type="submit" name="question" value="What is the payroll system?">Payroll</button>
+          </div>
+        </form>
+        {% if result %}
+          {% if result.ok %}
+          <div class="quote">
+            <em>From passage {{ result.passage_no }} · {{ result.score }} matching terms</em>
+            <p>{{ result.passage }}</p>
+          </div>
+          {% else %}
+          <p class="miss">{{ result.reason }}</p>
+          {% endif %}
+        {% else %}
+          <p class="empty">Load the sample, then use a question below. Payroll should refuse.</p>
+        {% endif %}
+      </section>
+    </div>
+  </div>
+  <script src="/static/field.js"></script>
+</body>
+</html>
